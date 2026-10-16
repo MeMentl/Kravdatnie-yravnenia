@@ -1,0 +1,46 @@
+import math
+
+MAX_TERMS = 10_000
+MAX_EPS = 0.0001
+MAX_ITERATIONS = 100_000
+
+def check_params(terms, eps):
+    if terms is not None:
+        if not (1 <= terms <= MAX_TERMS):
+            raise ValueError("Количество слагаемых вне диапазона")
+    elif not (math.isfinite(eps) and 0 < eps <= MAX_EPS):
+            raise ValueError("Точность вне диапазона")
+
+def sign(n):
+    if n%2==0: return -1
+    else:      return  1
+
+def term_third(n):
+    return sign(n) / (3*n)
+
+def term_sqplus(n):
+    return sign(n) / (n*n+1)
+
+FORMULAS = {
+    "third":  (term_third, "S = 1/3 - 1/6 + 1/9 - 1/12 + ..."),
+    "sqplus": (term_sqplus, "S = 1/(1^2+1) - 1/(2^2+1) + 1/(3^2+1) + ...")
+
+}
+
+def sum_terms(term, terms):
+    rez = 0
+    for n in range(1, terms+1):
+        rez=rez+term(n)
+    return rez
+
+def sum_eps(term, eps):
+    rez = 0
+    n = 0
+    while True:
+        n = n+1
+        val = term(n)
+        rez = rez+val
+        if abs(val)<eps:
+            return rez, n
+        if n >= MAX_ITERATIONS:
+            raise ValueError("Точность не достигнута")
